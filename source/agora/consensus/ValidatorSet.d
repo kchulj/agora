@@ -103,7 +103,7 @@ public class ValidatorSet
                     "distance, preimage) VALUES (?, ?, ?, ?, ?)",
                     enroll.utxo_key.toString(), enroll.cycle_length,
                     block_height.value, ZeroDistance,
-                    enroll.random_seed.toString());
+                    enroll.commitment.toString());
             }();
         }
         catch (Exception ex)
@@ -506,7 +506,7 @@ public class ValidatorSet
 
 version (unittest)
 private Enrollment createEnrollment(const ref Hash utxo_key,
-    const KeyPair key_pair, ref Scalar random_seed_src,
+    const KeyPair key_pair, ref Scalar commitment_src,
     uint validator_cycle)
 {
     import std.algorithm;
@@ -518,11 +518,11 @@ private Enrollment createEnrollment(const ref Hash utxo_key,
     auto enroll = Enrollment();
     auto signature_noise = Pair.random();
     auto cache = PreImageCache(validator_cycle, 1);
-    cache.reset(hashFull(random_seed_src));
+    cache.reset(hashFull(commitment_src));
 
     enroll.utxo_key = utxo_key;
     enroll.cycle_length = validator_cycle;
-    enroll.random_seed = cache[$ - 1];
+    enroll.commitment = cache[$ - 1];
     enroll.enroll_sig = sign(pair.v, pair.V, signature_noise.V,
         signature_noise.v, enroll);
     return enroll;
@@ -604,7 +604,7 @@ unittest
     // test for adding and getting preimage
     assert(!set.hasPreimage(utxos[0], 10));
     assert(set.getPreimage(utxos[0])
-        == PreImageInfo(enroll.utxo_key, enroll.random_seed, 0));
+        == PreImageInfo(enroll.utxo_key, enroll.commitment, 0));
     auto preimage = PreImageInfo(utxos[0], cache[$ - 11], 10);
     assert(set.addPreimage(preimage));
     assert(set.hasPreimage(utxos[0], 10));
@@ -614,7 +614,7 @@ unittest
     assert(set.getPreimageAt(utxos[0], Height(12))  // N/A: not revealed yet!
         == PreImageInfo.init);
     assert(set.getPreimageAt(utxos[0], Height(1))
-        == PreImageInfo(enroll.utxo_key, enroll.random_seed, 0));
+        == PreImageInfo(enroll.utxo_key, enroll.commitment, 0));
     assert(set.getPreimageAt(utxos[0], Height(11)) == preimage);
     assert(set.getPreimageAt(utxos[0], Height(10)) ==
         PreImageInfo(preimage.enroll_key, hashFull(preimage.hash),

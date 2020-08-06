@@ -64,20 +64,20 @@ public struct QuorumParams
 /*******************************************************************************
 
     Build the quorum configuration for the given public key and the registered
-    enrollment keys. The random seed is used to introduce partial randomness
+    enrollment keys. The commitment is used to introduce partial randomness
     to the quorum assignment of each node.
 
     Params:
         key = the key of the node for which to generate the quorum
         utxo_keys = the list of UTXO keys of all the active enrollments
         finder = UTXO finder delegate
-        rand_seed = the random seed
+        commitment = the commitment
         params = quorum generator algorithm tweaking parameters
 
 *******************************************************************************/
 
 public QuorumConfig buildQuorumConfig ( const ref PublicKey key,
-    in Hash[] utxo_keys, scope UTXOFinder finder, const ref Hash rand_seed,
+    in Hash[] utxo_keys, scope UTXOFinder finder, const ref Hash commitment,
     const ref QuorumParams params )
     @safe nothrow
 {
@@ -93,7 +93,7 @@ public QuorumConfig buildQuorumConfig ( const ref PublicKey key,
 
     // for filtering duplicates from dice()
     auto added = BitField!uint(stakes.length);
-    auto RNG_gen = getGenerator(key, rand_seed);
+    auto RNG_gen = getGenerator(key, commitment);
     auto stake_amounts = stakes.map!(stake => stake.amount.integral);
 
     static assumeNothrow (T)(lazy T exp) nothrow
@@ -401,7 +401,7 @@ unittest
 /*******************************************************************************
 
     Create a random number generator which uses the node's public key hashed
-    with the random seed as an initializer for the RNG engine.
+    with the commitment as an initializer for the RNG engine.
 
     Using the Mersene Twister 19937 64-bit random number generator.
     The public key is reduced to a short hash of 8 bytes which is then
@@ -409,18 +409,18 @@ unittest
 
     Params
         key = the public key of a node
-        rand_seed = the random seed
+        commitment = the commitment
 
     Returns:
         a Mersenne Twister 64bit random generator
 
 *******************************************************************************/
 
-private auto getGenerator (const ref PublicKey key, const ref Hash rand_seed)
+private auto getGenerator (const ref PublicKey key, const ref Hash commitment)
     @safe nothrow
 {
     Mt19937_64 gen;
-    const hash = hashMulti(key, rand_seed);
+    const hash = hashMulti(key, commitment);
     gen.seed(toShortHash(hash));
     return gen;
 }
@@ -483,7 +483,7 @@ private NodeStake[] buildStakesDescending (const ref PublicKey filter,
 
 version (unittest)
 private QuorumConfig[PublicKey] buildTestQuorums (Range)(Range amounts,
-    const(PublicKey)[] keys, const auto ref Hash rand_seed,
+    const(PublicKey)[] keys, const auto ref Hash commitment,
     const auto ref QuorumParams params)
 {
     assert(amounts.length == keys.length);
@@ -504,7 +504,7 @@ private QuorumConfig[PublicKey] buildTestQuorums (Range)(Range amounts,
     foreach (idx, _; amounts.enumerate)
     {
         quorums[keys[idx]] = buildQuorumConfig(
-            keys[idx], utxos, &storage.findUTXO, rand_seed, params);
+            keys[idx], utxos, &storage.findUTXO, commitment, params);
     }
 
     return quorums;

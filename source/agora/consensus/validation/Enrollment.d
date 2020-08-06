@@ -142,7 +142,7 @@ unittest
 
     Enrollment enroll1;
     enroll1.utxo_key = utxo_hash1;
-    enroll1.random_seed = hashFull(Scalar.random());
+    enroll1.commitment = hashFull(Scalar.random());
     enroll1.cycle_length = 1008;
     enroll1.enroll_sig = sign(node_key_pair_1, signature_noise, enroll1);
 
@@ -152,7 +152,7 @@ unittest
 
     Enrollment enroll2;
     enroll2.utxo_key = utxo_hash2;
-    enroll2.random_seed = hashFull(Scalar.random());
+    enroll2.commitment = hashFull(Scalar.random());
     enroll2.cycle_length = 1008;
     enroll2.enroll_sig = sign(node_key_pair_2, signature_noise, enroll2);
 
@@ -162,7 +162,7 @@ unittest
 
     Enrollment enroll3;
     enroll3.utxo_key = utxo_hash3;
-    enroll3.random_seed = hashFull(Scalar.random());
+    enroll3.commitment = hashFull(Scalar.random());
     enroll3.cycle_length = 1008;
     enroll3.enroll_sig = sign(node_key_pair_3, signature_noise, enroll3);
 
@@ -173,7 +173,7 @@ unittest
 
     Enrollment enroll4;
     enroll4.utxo_key = utxo_hash4;
-    enroll4.random_seed = hashFull(Scalar.random());
+    enroll4.commitment = hashFull(Scalar.random());
     enroll4.cycle_length = 1008;
     enroll4.enroll_sig = sign(node_key_pair_4, signature_noise, enroll4);
 

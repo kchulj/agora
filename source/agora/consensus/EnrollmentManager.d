@@ -359,7 +359,7 @@ public class EnrollmentManager
         Enrollment result = {
             utxo_key: utxo,
             cycle_length: cycle_length,
-            random_seed: seed,
+            commitment: seed,
         };
 
         // Generate signature noise
@@ -1232,7 +1232,7 @@ unittest
     Hash utxo;
     auto e1 = EnrollmentManager.makeEnrollment(WK.Keys.A, utxo, 10, 0);
     auto e2 = EnrollmentManager.makeEnrollment(WK.Keys.B, utxo, 10, 0);
-    assert(e1.random_seed != e2.random_seed);
+    assert(e1.commitment != e2.commitment);
 }
 
 /// Test for the height when the enrollment will be available
