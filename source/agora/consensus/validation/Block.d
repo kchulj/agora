@@ -584,9 +584,16 @@ unittest
         findUTXO, Enrollment.MinValidatorCount));
     const last_root = block.header.merkle_root;
 
-    // txs with a different amount
-    block = GenesisBlock.makeNewBlock(
-        makeChainedTransactions(gen_key, prev_txs, 1, 20_000_000));
+    block = GenesisBlock.makeNewBlock(prev_txs.map!(tx => TxBuilder(tx).sign()));
+
+    // one tx with a different amount
+    block.txs[0].outputs[0].value = Amount(20_000_000 / 8);
+    block.txs[0].inputs[0].signature = gen_key.secret.sign(
+        hashFull(block.txs[0])[]);
+
+    block.txs.sort;
+    block.header.merkle_root = block.buildMerkleTree();
+
     assert(block.isValid(GenesisBlock.header.height, GenesisBlock.header.hashFull(),
         findUTXO, Enrollment.MinValidatorCount));
 
@@ -615,10 +622,26 @@ unittest
     foreach (ref tx; GenesisBlock.txs)
         utxo_set.put(tx);
 
-    auto txs_1 = makeChainedTransactions(gen_key, null, 1,
-        400_000_000_000 * 8).sort.array;
+    auto txs_1 = genesisSpendable().map!(txb => txb.sign()).array();
 
     auto block1 = makeNewBlock(GenesisBlock, txs_1);
+
+    foreach (idx1, txs1; block1.txs)
+    {
+        foreach (idx2, txs2; block1.txs[idx1].outputs)
+            block1.txs[idx1].outputs[idx2].value = Amount(400_000_000_000);
+    }
+
+    foreach (idx1, txs1; block1.txs)
+    {
+        foreach (idx2, txs2; block1.txs[idx1].inputs)
+            block1.txs[idx1].inputs[idx2].signature = gen_key.secret.sign(
+                hashFull(block1.txs[idx1])[]);
+    }
+
+    block1.txs.sort;
+    block1.header.merkle_root = block1.buildMerkleTree();
+
     assert(block1.isValid(GenesisBlock.header.height, gen_hash, findUTXO,
         Enrollment.MinValidatorCount));
 
@@ -737,8 +760,7 @@ unittest
     foreach (ref tx; GenesisBlock.txs)
         utxo_set.put(tx);
 
-    auto txs_1 = makeChainedTransactions(gen_key, null, 1,
-        400_000_000_000 * 10 * 8).sort.array;
+    auto txs_1 = genesisSpendable().map!(txb => txb.sign()).array();
 
     auto block1 = makeNewBlock(GenesisBlock, txs_1);
     assert(block1.isValid(GenesisBlock.header.height, gen_hash, findUTXO,
