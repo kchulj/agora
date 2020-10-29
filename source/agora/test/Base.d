@@ -1591,13 +1591,14 @@ public APIManager makeTestNetwork (APIManager : TestAPIManager = TestAPIManager)
     }
 
     Config makeValidatorConfig (size_t idx, KeyPair key_pair,
-        Address self_address, Address[] addresses)
+        Address self_address, Address[] addresses,
+        Address registry_address = test_conf.registry_address)
     {
         Config conf =
         {
             banman : ban_conf,
             node : makeNodeConfig(self_address),
-            validator : ValidatorConfig(true, key_pair, [self_address]),
+            validator : ValidatorConfig(true, key_pair, [self_address], registry_address),
             network : makeNetworkConfig(idx, addresses),
         };
 
