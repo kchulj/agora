@@ -923,7 +923,7 @@ unittest
     KeyPair key_pair = KeyPair.random();
 
     genesisSpendable().map!(txb => txb.refund(key_pair.address).sign(TxType.Freeze))
-        .each!(tx => utxo_set.put(tx));
+        .each!(tx => utxo_set.updateUTXOCache(tx, Height(0)));
 
     // create an EnrollmentManager object
     auto man = new EnrollmentManager(":memory:", key_pair,
@@ -1052,7 +1052,7 @@ unittest
     KeyPair key_pair = KeyPair.random();
 
     genesisSpendable().map!(txb => txb.refund(key_pair.address).sign(TxType.Freeze))
-        .each!(tx => utxo_set.put(tx));
+        .each!(tx => utxo_set.updateUTXOCache(tx, Height(0)));
     UTXO[Hash] utxos = utxo_set.storage;
 
     auto man = new EnrollmentManager(":memory:", key_pair,
@@ -1149,7 +1149,7 @@ unittest
     KeyPair key_pair = KeyPair.random();
 
     genesisSpendable().map!(txb => txb.refund(key_pair.address).sign(TxType.Freeze))
-        .each!(tx => utxo_set.put(tx));
+        .each!(tx => utxo_set.updateUTXOCache(tx, Height(0)));
     UTXO[Hash] utxos = utxo_set.storage;
 
     // create an EnrollmentManager object
@@ -1233,7 +1233,7 @@ unittest
     scope utxo_set = new TestUTXOSet;
     KeyPair key_pair = KeyPair.random();
     genesisSpendable().map!(txb => txb.refund(key_pair.address).sign(TxType.Freeze))
-        .each!(tx => utxo_set.put(tx));
+        .each!(tx => utxo_set.updateUTXOCache(tx, Height(0)));
     auto utxos = utxo_set.storage;
 
     // create an EnrollmentManager
@@ -1303,7 +1303,7 @@ unittest
             .refund(pairs[tup.index].address)
             .sign(TxType.Freeze))
         .each!((tx) {
-            storage.put(tx);
+            storage.updateUTXOCache(tx, Height(0));
             utxos ~= UTXO.getHash(tx.hashFull(), 0);
         });
 
@@ -1360,7 +1360,7 @@ unittest
     scope utxo_set = new TestUTXOSet;
     genesisSpendable()
         .map!(txb => txb.refund(WK.Keys[0].address).sign(TxType.Freeze))
-        .each!(tx => utxo_set.put(tx));
+        .each!(tx => utxo_set.updateUTXOCache(tx, Height(0)));
     scope man = new EnrollmentManager(":memory:", WK.Keys[0],
         new immutable(ConsensusParams)(10));
 
@@ -1386,7 +1386,7 @@ unittest
     auto utxo_set = new TestUTXOSet;
     genesisSpendable()
         .map!(txb => txb.refund(WK.Keys.A.address).sign(TxType.Freeze))
-        .each!(tx => utxo_set.put(tx));
+        .each!(tx => utxo_set.updateUTXOCache(tx, Height(0)));
     auto man = new EnrollmentManager(":memory:", WK.Keys.A,
         new immutable(ConsensusParams)(10));
 

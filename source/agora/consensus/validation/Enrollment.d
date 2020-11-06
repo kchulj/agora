@@ -174,10 +174,10 @@ unittest
     assert(!enroll3.isValid(utxoFinder));
     assert(!enroll4.isValid(utxoFinder));
 
-    utxo_set.put(tx1);
-    utxo_set.put(tx2);
-    utxo_set.put(tx3);
-    utxo_set.put(tx4);
+    utxo_set.updateUTXOCache(tx1, Height(0));
+    utxo_set.updateUTXOCache(tx2, Height(0));
+    utxo_set.updateUTXOCache(tx3, Height(0));
+    utxo_set.updateUTXOCache(tx4, Height(0));
 
     // Nomal
     assert(enroll1.isValid(utxoFinder));

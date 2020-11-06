@@ -563,7 +563,7 @@ unittest
     genesisSpendable().take(8).enumerate
         .map!(en => en.value.refund(WK.Keys[en.index].address).sign(TxType.Freeze))
         .each!((tx) {
-            storage.put(tx);
+            storage.updateUTXOCache(tx, Height(0));
             utxos ~= UTXO.getHash(tx.hashFull(), 0);
         });
 

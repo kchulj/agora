@@ -197,7 +197,7 @@ unittest
     Hash tx_1_hash = hashFull(tx_1);
 
     scope storage = new TestUTXOSet;
-    storage.put(tx_1);
+    storage.updateUTXOCache(tx_1, Height(0));
 
     // Creates the second transaction.
     Transaction tx_2 =
@@ -593,7 +593,7 @@ unittest
         [],
         [Output(Amount(50), key_pair.address)]
     );
-    storage.put(oneTx);
+    storage.updateUTXOCache(oneTx, Height(0));
 
     // test for Payment transaction having no input
     assert(canFind(toLower(oneTx.isInvalidReason(storage.getUTXOFinder(), Height(0))), "no input"),
@@ -602,7 +602,7 @@ unittest
     // create a transaction
     Transaction firstTx = { outputs: [ Output(Amount(100_1000), key_pair.address) ] };
     Hash firstHash = hashFull(firstTx);
-    storage.put(firstTx);
+    storage.updateUTXOCache(firstTx, Height(0));
 
     // create a transaction having no output
     Transaction secondTx = Transaction(
@@ -610,7 +610,7 @@ unittest
         [Input(firstHash, 0)],
         []
     );
-    storage.put(secondTx);
+    storage.updateUTXOCache(secondTx, Height(0));
 
     // test for Freeze transaction having no output
     assert(canFind(toLower(secondTx.isInvalidReason(storage.getUTXOFinder(), Height(0))), "no output"),
@@ -631,7 +631,7 @@ unittest
         [Output(Amount(100), key_pairs[0].address)]
     );
     Hash firstHash = hashFull(firstTx);
-    storage.put(firstTx);
+    storage.updateUTXOCache(firstTx, Height(0));
 
     // create the second transaction.
     Transaction secondTx = Transaction(
@@ -640,7 +640,7 @@ unittest
         [Output(Amount(100), key_pairs[0].address)]
     );
     Hash secondHash = hashFull(secondTx);
-    storage.put(secondTx);
+    storage.updateUTXOCache(secondTx, Height(0));
 
     // create the third transaction
     Transaction thirdTx = Transaction(
@@ -649,7 +649,7 @@ unittest
         [Output(Amount(100), key_pairs[1].address)]
     );
     Hash thirdHash = hashFull(thirdTx);
-    storage.put(thirdTx);
+    storage.updateUTXOCache(thirdTx, Height(0));
     thirdTx.inputs[0].signature = key_pairs[0].secret.sign(thirdHash[]);
     thirdTx.inputs[1].signature = key_pairs[0].secret.sign(thirdHash[]);
 
@@ -693,7 +693,7 @@ unittest
         [Input(Hash.init, 0)],
         [Output(Amount.MaxUnitSupply, key_pairs[0].address)]
     );
-    storage.put(firstTx);
+    storage.updateUTXOCache(firstTx, Height(0));
     const firstHash = UTXO.getHash(firstTx.hashFull(), 0);
 
     // create the second transaction
@@ -702,7 +702,7 @@ unittest
         [Input(Hash.init, 0)],
         [Output(Amount(100), key_pairs[0].address)]
     );
-    storage.put(secondTx);
+    storage.updateUTXOCache(secondTx, Height(0));
     const secondHash = UTXO.getHash(secondTx.hashFull(), 0);
 
     // create the third transaction
@@ -711,7 +711,7 @@ unittest
         [Input(firstHash, 0), Input(secondHash, 0)],
         [Output(Amount(100), key_pairs[1].address)]
     );
-    storage.put(thirdTx);
+    storage.updateUTXOCache(thirdTx, Height(0));
     auto thirdHash = hashFull(thirdTx);
     thirdTx.inputs[0].signature = key_pairs[0].secret.sign(thirdHash[]);
     thirdTx.inputs[1].signature = key_pairs[0].secret.sign(thirdHash[]);
@@ -726,7 +726,7 @@ unittest
         [Input(firstHash, 0), Input(secondHash, 0)],
         [Output(Amount(100), key_pairs[1].address)]
     );
-    storage.put(fourthTx);
+    storage.updateUTXOCache(fourthTx, Height(0));
     auto fourthHash = hashFull(fourthTx);
     fourthTx.inputs[0].signature = key_pairs[0].secret.sign(fourthHash[]);
     fourthTx.inputs[1].signature = key_pairs[0].secret.sign(fourthHash[]);
@@ -749,7 +749,7 @@ unittest
         [Input(Hash.init, 0)],
         [Output(Amount(100), key_pairs[0].address)]
     );
-    storage.put(firstTx);
+    storage.updateUTXOCache(firstTx, Height(0));
     const firstHash = UTXO.getHash(firstTx.hashFull(), 0);
 
     // create the second transaction
@@ -758,7 +758,7 @@ unittest
         [Input(Hash.init, 0)],
         [Output(Amount(100), key_pairs[0].address)]
     );
-    storage.put(secondTx);
+    storage.updateUTXOCache(secondTx, Height(0));
     const secondHash = UTXO.getHash(secondTx.hashFull(), 0);
 
     // create the third transaction
@@ -768,7 +768,7 @@ unittest
         [Output(Amount.MaxUnitSupply, key_pairs[1].address),
             Output(Amount(100), key_pairs[1].address)]
     );
-    storage.put(thirdTx);
+    storage.updateUTXOCache(thirdTx, Height(0));
     auto thirdHash = hashFull(thirdTx);
     thirdTx.inputs[0].signature = key_pairs[0].secret.sign(thirdHash[]);
     thirdTx.inputs[1].signature = key_pairs[0].secret.sign(thirdHash[]);

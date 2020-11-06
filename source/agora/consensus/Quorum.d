@@ -496,7 +496,7 @@ private QuorumConfig[PublicKey] buildTestQuorums (Range)(Range amounts,
             outputs: [Output(amount, keys[idx])]
         };
 
-        storage.put(tx);
+        storage.updateUTXOCache(tx, Height(0));
     }
 
     Hash[] utxos = storage.keys;

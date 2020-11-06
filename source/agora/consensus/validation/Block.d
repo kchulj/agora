@@ -433,7 +433,7 @@ unittest
     assert(GenesisBlock.isGenesisBlockValid());
     auto gen_hash = GenesisBlock.header.hashFull();
 
-    GenesisBlock.txs.each!(tx => utxos.put(tx));
+    GenesisBlock.txs.each!(tx => utxos.updateUTXOCache(tx, Height(0)));
     auto block = GenesisBlock.makeNewBlock(genesisSpendable().map!(txb => txb.sign()));
 
     // height check
@@ -488,13 +488,13 @@ unittest
     assert(!block.isValid(GenesisBlock.header.height, gen_hash, findUTXO,
         Enrollment.MinValidatorCount));
 
-    GenesisBlock.txs.each!(tx => utxos.put(tx));
+    GenesisBlock.txs.each!(tx => utxos.updateUTXOCache(tx, Height(0)));
     assert(block.isValid(GenesisBlock.header.height, gen_hash, findUTXO,
         Enrollment.MinValidatorCount));
 
     utxos.clear();  // genesis is spent
     auto prev_txs = block.txs;
-    prev_txs.each!(tx => utxos.put(tx));  // these will be spent
+    prev_txs.each!(tx => utxos.updateUTXOCache(tx, Height(0)));  // these will be spent
 
     auto prev_block = block;
     block = block.makeNewBlock(prev_txs.map!(tx => TxBuilder(tx).sign()));
@@ -509,7 +509,7 @@ unittest
         assert(!block.isValid(prev_block.header.height, prev_block.header.hashFull(),
             findUTXO, Enrollment.MinValidatorCount));
 
-        utxos.put(tx);
+        utxos.updateUTXOCache(tx, Height(0));
         assert(block.isValid(prev_block.header.height, prev_block.header.hashFull(),
             findUTXO, Enrollment.MinValidatorCount));
     }
@@ -610,7 +610,7 @@ unittest
     assert(GenesisBlock.isGenesisBlockValid());
     auto gen_hash = GenesisBlock.header.hashFull();
     foreach (ref tx; GenesisBlock.txs)
-        utxo_set.put(tx);
+        utxo_set.updateUTXOCache(tx, Height(0));
 
     auto txs_1 = genesisSpendable().map!(txb => txb.sign()).array();
 
@@ -619,7 +619,7 @@ unittest
         Enrollment.MinValidatorCount));
 
     foreach (ref tx; txs_1)
-        utxo_set.put(tx);
+        utxo_set.updateUTXOCache(tx, Height(0));
 
     KeyPair keypair = KeyPair.random();
     Transaction[] txs_2;
@@ -661,7 +661,7 @@ unittest
     assert(block2.isValid(block1.header.height, hashFull(block1.header), findUTXO,
         Enrollment.MinValidatorCount));
     foreach (ref tx; txs_2)
-        utxo_set.put(tx);
+        utxo_set.updateUTXOCache(tx, Height(0));
 
     KeyPair keypair2 = KeyPair.random();
     Transaction[] txs_3;
@@ -729,7 +729,7 @@ unittest
     assert(GenesisBlock.isGenesisBlockValid());
     auto gen_hash = GenesisBlock.header.hashFull();
     foreach (ref tx; GenesisBlock.txs)
-        utxo_set.put(tx);
+        utxo_set.updateUTXOCache(tx, Height(0));
 
     auto txs_1 = genesisSpendable().map!(txb => txb.sign()).array();
 
@@ -738,7 +738,7 @@ unittest
         Enrollment.MinValidatorCount));
 
     foreach (ref tx; txs_1)
-        utxo_set.put(tx);
+        utxo_set.updateUTXOCache(tx, Height(0));
 
     KeyPair keypair = KeyPair.random();
     Transaction[] txs_2;
@@ -771,7 +771,7 @@ unittest
     assert(block2.isValid(block1.header.height, hashFull(block1.header), findUTXO,
         Enrollment.MinValidatorCount));
     foreach (ref tx; txs_2)
-        utxo_set.put(tx);
+        utxo_set.updateUTXOCache(tx, Height(0));
 
     // When all existing validators expire at the new block height and the number of enrollments
     // in the new block is 0, the block is considered invalid.

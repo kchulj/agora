@@ -344,7 +344,7 @@ unittest
     Height avail_height;
 
     genesisSpendable().map!(txb => txb.refund(key_pair.address).sign(TxType.Freeze))
-        .each!(tx => storage.put(tx));
+        .each!(tx => storage.updateUTXOCache(tx, Height(0)));
 
     // Add enrollments
     Hash[] utxo_hashes = storage.keys;
