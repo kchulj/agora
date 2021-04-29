@@ -25,11 +25,15 @@ import vibe.core.core;
 import vibe.http.common;
 import vibe.web.rest;
 
-mixin AddLogger!();
-
 /// Implementation of `NameRegistryAPI` using associative arrays
 public final class NameRegistry: NameRegistryAPI
 {
+    /// Logger instance
+    protected Logger log;
+
+    /// Avoid using the caller's module as our logger name
+    private static immutable string ThisModule = __MODULE__;
+
     ///
     private RegistryPayload[PublicKey] registry_map;
 
@@ -37,8 +41,9 @@ public final class NameRegistry: NameRegistryAPI
     private RegistryStats registry_stats;
 
     ///
-    public this ()
+    public this (Logger logger = Logger(ThisModule))
     {
+        this.log = logger;
         Utils.getCollectorRegistry().addCollector(&this.collectRegistryStats);
     }
 
